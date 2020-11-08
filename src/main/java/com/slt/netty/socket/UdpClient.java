@@ -9,6 +9,7 @@ import java.net.InetSocketAddress;
 
 /**
  * @ProjectName:
+ * 发送long值
  */
 public class UdpClient {
     public static void main(String[] args) throws Exception {

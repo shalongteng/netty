@@ -10,6 +10,7 @@ import java.net.SocketException;
 
 /**
  * @ProjectName: netty
+ * 接收long值
  */
 public class UdpServer {
     public static void main(String[] args) throws Exception {
