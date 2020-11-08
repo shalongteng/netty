@@ -6,7 +6,7 @@ import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 
 /**
- * @ProjectName: netty
+ * @ProjectName:
  */
 public class UdpClient {
     public static void main(String[] args) throws Exception {
