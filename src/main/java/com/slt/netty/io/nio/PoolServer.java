@@ -80,7 +80,7 @@ public class PoolServer {
                 } else if (key.isReadable()) {
                     //
                     key.interestOps(key.interestOps()&(~SelectionKey.OP_READ));
-                    //
+                    //读 交给线程池
                     pool.execute(new ThreadHandlerChannel(key));
                 }
             }

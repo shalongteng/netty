@@ -17,10 +17,12 @@
     JAVA NIO中的一些主要Channel的实现：
         FileChannel  
             从文件中读写数据。
+            无法设置成非阻塞
         DatagramChannel
             能通过UDP读写网络中的数据。
         SocketChannel 
-            能通过TCP读写网络中的数据。
+            是一个连接到TCP网络套接字的通道。
+            
         ServerSocketChannel
             监听新进来的TCP连接，像Web服务器那样。对每一个连接都会创建一个SocketChannel。
         
@@ -52,7 +54,7 @@
             在写模式下，Buffer的limit表示你最多能往Buffer里写多少数据。 写模式下，limit等于Buffer的capacity。
             在读模式下：
                  limit表示你最多能读到多少数据，limit会被设置成写模式下的position值。
-#3、Selector 选择器
+#4、Selector 选择器
     Selector能够检测一到多个NIO通道，并能够知晓通道是否为诸如读写事件做好准备的组件。
     一个单独的线程可以管理多个channel，从而管理多个网络连接。
     
@@ -61,6 +63,16 @@
     单个线程来处理多个Channels的好处是，
         只需要更少的线程来处理通道。可以只用一个线程处理所有的通道。减少线程上下文切换带来的开销
         每个线程都要占用系统的一些资源（如内存）。因此，使用的线程越少越好。
-#3、Channel
-
-#3、Selector
+#5、Pipe
+    Java NIO 管道是2个线程之间的单向数据连接。Pipe有一个source通道和一个sink通道。
+    数据会被写到sink通道，从source通道读取。
+    
+#6、Java NIO和IO的主要区别
+    IO                NIO
+    面向流            面向缓冲
+    阻塞IO            非阻塞IO
+    无                选择器
+    
+     Java NIO的非阻塞模式，使一个线程从某通道发送请求读取数据，但是它仅能得到目前可用的数据，
+     如果目前没有数据可用时，就什么都不会获取。而不是保持线程阻塞，所以直至数据变的可以读取之前，
+     该线程可以继续做其他的事情

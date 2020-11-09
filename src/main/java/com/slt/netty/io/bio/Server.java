@@ -11,6 +11,8 @@ import java.net.Socket;
  * bio+多线程
  *  bio阻塞读或者写的时候，使用多线程
  *  利用多核
+ *
+ * 正常不能throws 异常，需要try处理，正确管理连接。
  */
 public class Server {
     public static void main(String[] args) throws IOException {
@@ -33,9 +35,10 @@ public class Server {
     static void handle(Socket s) {
         try {
             byte[] bytes = new byte[1024];
+            //读也是阻塞
             int len = s.getInputStream().read(bytes);
             System.out.println("server"+new String(bytes, 0, len));
-
+            //写也是阻塞
             s.getOutputStream().write(bytes, 0, len);
             s.getOutputStream().flush();
         } catch (IOException e) {

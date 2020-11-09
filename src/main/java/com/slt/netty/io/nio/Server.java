@@ -25,9 +25,12 @@ public class Server {
         Selector selector = Selector.open();
         ssc.register(selector, SelectionKey.OP_ACCEPT);
 
+        //轮询
         while(true) {
+            //阻塞方法 必须有一件事发生了
             selector.select();
             //调用selector的selectedKeys()方法，访问“已选择键集（selected key set）”中的就绪通道
+            //selector 会往每一个插座扔一个监听器（key），事件发生了，会扔到set里
             Set<SelectionKey> keys = selector.selectedKeys();
             Iterator<SelectionKey> it = keys.iterator();
             while(it.hasNext()) {
@@ -40,6 +43,7 @@ public class Server {
     }
 
     private static void handle(SelectionKey key) {
+        //如果发现 客户端要连接上来，就建立这个通道
         if(key.isAcceptable()) {
             try {
                 ServerSocketChannel ssc = (ServerSocketChannel) key.channel();
