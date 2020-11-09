@@ -27,6 +27,7 @@ public class Server {
 
         while(true) {
             selector.select();
+            //调用selector的selectedKeys()方法，访问“已选择键集（selected key set）”中的就绪通道
             Set<SelectionKey> keys = selector.selectedKeys();
             Iterator<SelectionKey> it = keys.iterator();
             while(it.hasNext()) {
