@@ -9,76 +9,54 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
  * nio 多线程模型
+ * selector + 线程池
  */
 public class PoolServer {
-
-    ExecutorService pool = Executors.newFixedThreadPool(50);
-
+    private ExecutorService pool = Executors.newFixedThreadPool(50);
     private Selector selector;
-    //中文测试
 
-    /**
-     *
-     * @throws IOException
-     */
     public static void main(String[] args) throws IOException {
         PoolServer server = new PoolServer();
         server.initServer(8000);
         server.listen();
     }
 
-    /**
-     *
-     * @param port
-     * @throws IOException
-     */
     public void initServer(int port) throws IOException {
-        //
         ServerSocketChannel serverChannel = ServerSocketChannel.open();
-        //
         serverChannel.configureBlocking(false);
-        //
         serverChannel.socket().bind(new InetSocketAddress(port));
-        //
         this.selector = Selector.open();
 
         serverChannel.register(selector, SelectionKey.OP_ACCEPT);
         System.out.println("服务端启动成功！");
     }
 
-    /**
-     *
-     * @throws IOException
-     */
+
     @SuppressWarnings("unchecked")
     public void listen() throws IOException {
-        // 轮询访问selector  
+        // 轮询访问selector
         while (true) {
-            //
             selector.select();
-            //
-            Iterator ite = this.selector.selectedKeys().iterator();
+            Set<SelectionKey> keySet = this.selector.selectedKeys();
+            Iterator ite = keySet.iterator();
             while (ite.hasNext()) {
                 SelectionKey key = (SelectionKey) ite.next();
-                //
+                //需要移出这个事件，否则会再处理一遍
                 ite.remove();
-                //
+                //连接就绪
                 if (key.isAcceptable()) {
                     ServerSocketChannel server = (ServerSocketChannel) key.channel();
-                    //
                     SocketChannel channel = server.accept();
-                    //
                     channel.configureBlocking(false);
-                    //
                     channel.register(this.selector, SelectionKey.OP_READ);
-                    //
                 } else if (key.isReadable()) {
-                    //
+                    //位非运算符（~）
                     key.interestOps(key.interestOps()&(~SelectionKey.OP_READ));
                     //读 交给线程池
                     pool.execute(new ThreadHandlerChannel(key));
@@ -88,11 +66,6 @@ public class PoolServer {
     }
 }
 
-/**
- *
- * @param
- * @throws IOException
- */
 class ThreadHandlerChannel extends Thread{
     private SelectionKey key;
     ThreadHandlerChannel(SelectionKey key){
@@ -100,11 +73,8 @@ class ThreadHandlerChannel extends Thread{
     }
     @Override
     public void run() {
-        //
         SocketChannel channel = (SocketChannel) key.channel();
-        //
         ByteBuffer buffer = ByteBuffer.allocate(1024);
-        //
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             int size = 0;
@@ -118,13 +88,12 @@ class ThreadHandlerChannel extends Thread{
             byte[] content=baos.toByteArray();
             ByteBuffer writeBuf = ByteBuffer.allocate(content.length);
             writeBuf.put(content);
+            //切换成写模式
             writeBuf.flip();
             channel.write(writeBuf);//
             if(size==-1){
-
                 channel.close();
             }else{
-                //
                 key.interestOps(key.interestOps()|SelectionKey.OP_READ);
                 key.selector().wakeup();
             }

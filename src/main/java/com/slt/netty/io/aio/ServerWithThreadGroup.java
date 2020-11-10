@@ -10,13 +10,17 @@ import java.nio.channels.CompletionHandler;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * 多线程
+ * 类似netty
+ */
 public class ServerWithThreadGroup {
     public static void main(String[] args) throws Exception {
-
         ExecutorService executorService = Executors.newCachedThreadPool();
+        //对客户的进行分组  现在是只用了一个线程池
         AsynchronousChannelGroup threadGroup = AsynchronousChannelGroup.withCachedThreadPool(executorService, 1);
 
-        //中文测试
+        //threadGroup 扔进去 就成了多线程了
         final AsynchronousServerSocketChannel serverChannel = AsynchronousServerSocketChannel.open(threadGroup)
                 .bind(new InetSocketAddress(8888));
 

@@ -1,0 +1,9 @@
+#1、AIO和NIO区别
+    NIO2.0的异步套接字通道是真正的异步非阻塞I/O，它对应UNIX网络编程中的事件驱动I/O（AIO），
+    它不需要通过多路复用器（Selector）对注册的通道进行轮询操作即可实现异步读写，
+    从而简化了NIO的编程模型。
+#1、AsynchronousChannel
+    AsynchronousFileChannel,
+    AsynchronousSocketChannel, 
+    AsynchronousServerSocketChannel。
+#1、CompletionHandler：用户处理器
