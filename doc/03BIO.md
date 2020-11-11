@@ -52,14 +52,7 @@
             FileInputStream
             FileReader
 #5、处理流 包在别的管道上的管道
-    filteriing
         
-    converting between bytes and char
-    object serialzation
-    data conversion
-    counting
-    peeking ahead
-    printing
 #6、缓冲流
     buffering 缓冲流 带缓冲区的，带小桶的。
          需要套接在相应的节点流上，对读写数据提供缓冲，提高读写效率。
@@ -80,6 +73,7 @@
     DataOutputStream
         之前将一个long类型写到文件，需要long转string转字节数组，然后写入。
         现在可以直接写了。
+        
     ByteArrayInputStream
     ByteArrayOutputStream
         byteArray 字节数组 相当于一个字节数组被分配了，然后一个管道怼到这个字节数组上。

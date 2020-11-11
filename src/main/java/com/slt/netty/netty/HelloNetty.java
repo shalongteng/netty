@@ -7,7 +7,11 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.CharsetUtil;
+import io.netty.util.ReferenceCountUtil;
 
+/**
+ * sync方法保证上一个方法变成同步方法。
+ */
 public class HelloNetty {
     public static void main(String[] args) {
         new NettyServer(8888).serverStart();
@@ -35,17 +39,25 @@ class NettyServer {
                 .channel(NioServerSocketChannel.class)
                 //当每一个客户端连上来以后给它一个监听器 都看作是自己的一个孩子
                 .childHandler(new ChannelInitializer<SocketChannel>() {
+                    //此时已经连接上了
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
+                        System.out.println("ch: "+ch);
                         //监听器处理过程 就是 加一个对通道的处理器
-                        ch.pipeline().addLast(new Handler());
+                        //pipeline管道上加自己的处理器，类似责任链
+                        ChannelPipeline pipeline = ch.pipeline();
+                        pipeline.addLast(new Handler());
                     }
                 });
 
         try {
+            //这个sync是保证bing成功以后，在往下执行
             ChannelFuture f = b.bind(port).sync();
+            System.out.println("server start");
 
+            //如果没有人调用close方法closeFuture会一直等待。如果调用了close才会继续往下执行。
             f.channel().closeFuture().sync();
+            System.out.println("3333");
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
@@ -64,16 +76,15 @@ class Handler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         //super.channelRead(ctx, msg);
-        System.out.println("server: channel read");
-        ByteBuf buf = (ByteBuf)msg;
-
-        System.out.println(buf.toString(CharsetUtil.UTF_8));
-
+        ByteBuf buf = (ByteBuf) msg;
+        System.out.println("server: channel read：" + buf.toString(CharsetUtil.UTF_8));
+        //写会给客户端
         ctx.writeAndFlush(msg);
 
         ctx.close();
 
-        //buf.release();
+        ReferenceCountUtil.release(buf);
+//        buf.release();
     }
 
 

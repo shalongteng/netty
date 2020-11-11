@@ -7,6 +7,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.util.CharsetUtil;
 import io.netty.util.ReferenceCountUtil;
 
 /**
@@ -38,7 +39,7 @@ public class Client {
         try {
             System.out.println("start to connect...");
             //connect 异步方法如果不调用sync方法，需要加一个监听器来回调  sync同步阻塞等待
-            ChannelFuture future = b.connect("127.0.0.1", 8888);
+            ChannelFuture future = b.connect("127.0.0.1", 8888).sync();
 
             //异步的写法 加一个监听器listener
             future.addListener(new ChannelFutureListener() {
@@ -52,7 +53,6 @@ public class Client {
                 }
             });
             //不写同步等待，看不到异常的抛出
-            future.sync();
             future.channel().closeFuture().sync();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -67,12 +67,14 @@ public class Client {
 }
 
 class ClientHandler extends ChannelInboundHandlerAdapter {
-    //通道建立了，就写一个
+    //通道建立了，第一次初始化时候调用
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         System.out.println("channel is activated.");
-
-        final ChannelFuture f = ctx.writeAndFlush(Unpooled.copiedBuffer("HelloNetty".getBytes()));
+        //byteBuf 指向 直接内存 ，跳过gc
+        ByteBuf byteBuf = Unpooled.copiedBuffer("HelloNetty".getBytes());
+        //写到服务器 一个字符串，writeAndFlush会自动释放内存
+        final ChannelFuture f = ctx.writeAndFlush(byteBuf);
         f.addListener(new ChannelFutureListener() {
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {
@@ -88,7 +90,8 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         try {
             ByteBuf buf = (ByteBuf)msg;
-            System.out.println(buf.toString());
+            System.out.println("client: channel read：" + buf.toString(CharsetUtil.UTF_8));
+
         } finally {
             ReferenceCountUtil.release(msg);
         }
