@@ -35,7 +35,6 @@ public class Client {
                         channel.pipeline().addLast(new ClientHandler());
                     }
                 });
-
         try {
             System.out.println("start to connect...");
             //connect 异步方法如果不调用sync方法，需要加一个监听器来回调  sync同步阻塞等待
