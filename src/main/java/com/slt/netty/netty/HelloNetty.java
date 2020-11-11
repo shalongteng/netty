@@ -15,8 +15,6 @@ public class HelloNetty {
 }
 
 class NettyServer {
-
-
     int port = 8888;
 
     public NettyServer(int port) {
@@ -24,15 +22,22 @@ class NettyServer {
     }
 
     public void serverStart() {
+        //这两个group 可以理解成两个线程池
+        //bossGroup 相当于selector 负责连接
         EventLoopGroup bossGroup = new NioEventLoopGroup();
+        //负责连接以后的io处理
         EventLoopGroup workerGroup = new NioEventLoopGroup();
+        //对server的配置
         ServerBootstrap b = new ServerBootstrap();
 
         b.group(bossGroup, workerGroup)
+                //通道的类型
                 .channel(NioServerSocketChannel.class)
+                //当每一个客户端连上来以后给它一个监听器 都看作是自己的一个孩子
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
+                        //监听器处理过程 就是 加一个对通道的处理器
                         ch.pipeline().addLast(new Handler());
                     }
                 });
@@ -53,6 +58,9 @@ class NettyServer {
 }
 
 class Handler extends ChannelInboundHandlerAdapter {
+    /**
+     * msg 数据已经读进来了
+     */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         //super.channelRead(ctx, msg);

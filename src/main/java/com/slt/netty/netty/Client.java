@@ -21,7 +21,7 @@ public class Client {
     private void clientStart() {
         //事件处理的线程池  connect read write
         EventLoopGroup workers = new NioEventLoopGroup(5);
-        //辅助启动
+        //客户端的配置,辅助启动
         Bootstrap b = new Bootstrap();
         b.group(workers)
                 .channel(NioSocketChannel.class)
@@ -67,6 +67,7 @@ public class Client {
 }
 
 class ClientHandler extends ChannelInboundHandlerAdapter {
+    //通道建立了，就写一个
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         System.out.println("channel is activated.");
@@ -82,7 +83,7 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
 
 
     }
-
+    //通道可以读了 回调此函数
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         try {
