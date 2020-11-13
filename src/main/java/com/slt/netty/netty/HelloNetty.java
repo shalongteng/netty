@@ -83,7 +83,7 @@ class Handler extends ChannelInboundHandlerAdapter {
 
         ctx.close();
 
-        ReferenceCountUtil.release(buf);
+//        ReferenceCountUtil.release(buf);
 //        buf.release();
     }
 
