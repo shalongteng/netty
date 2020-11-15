@@ -27,6 +27,8 @@ repositories {
 dependencies {
     // https://mvnrepository.com/artifact/io.netty/netty-all
     compile group: 'io.netty', name: 'netty-all', version: '4.1.9.Final'
+// https://mvnrepository.com/artifact/org.projectlombok/lombok
+    compile group: 'org.projectlombok', name: 'lombok', version: '1.18.12'
 
 
     implementation 'org.springframework.boot:spring-boot-starter'
